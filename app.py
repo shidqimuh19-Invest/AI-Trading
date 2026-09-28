@@ -187,7 +187,62 @@ if menu == "Market Overview":
     )
 
     st.divider()
+    # =====================================================
+    # DIAGNOSTIK DISTRIBUSI PROBABILITY
+    # =====================================================
 
+    st.subheader("Diagnostik Probability Model")
+
+    probability_min = df["Probability"].min()
+    probability_rata_rata = df["Probability"].mean()
+    probability_median = df["Probability"].median()
+    probability_max = df["Probability"].max()
+
+    d1, d2, d3, d4 = st.columns(4)
+
+    d1.metric(
+        "Probability Minimum",
+        f"{probability_min * 100:.2f}%"
+    )
+
+    d2.metric(
+        "Probability Rata-rata",
+        f"{probability_rata_rata * 100:.2f}%"
+    )
+
+    d3.metric(
+        "Probability Median",
+        f"{probability_median * 100:.2f}%"
+    )
+
+    d4.metric(
+        "Probability Maksimum",
+        f"{probability_max * 100:.2f}%"
+    )
+
+    grafik_distribusi = px.histogram(
+        df,
+        x="Probability",
+        nbins=10,
+        title="Distribusi Probability Seluruh Saham",
+        labels={
+            "Probability": "Probability"
+        }
+    )
+
+    grafik_distribusi.update_xaxes(
+        tickformat=".0%"
+    )
+
+    grafik_distribusi.update_layout(
+        yaxis_title="Jumlah Saham"
+    )
+
+    st.plotly_chart(
+        grafik_distribusi,
+        use_container_width=True
+    )
+``  
     # -----------------------------------------------------
     # C. NILAI IHSG
     # -----------------------------------------------------
