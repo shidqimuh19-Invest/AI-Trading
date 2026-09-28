@@ -241,8 +241,7 @@ if menu == "Market Overview":
     st.plotly_chart(
         grafik_distribusi,
         use_container_width=True
-    )
-``  
+    )  
     # -----------------------------------------------------
     # C. NILAI IHSG
     # -----------------------------------------------------
