@@ -9,10 +9,11 @@ st.set_page_config(
 
 st.title("📈 LQ45 AI Trading Dashboard")
 
+# Load data
 df = pd.read_excel("AI_Ranking.xlsx")
 
-# Ranking
-st.subheader("Top Ranking Saham")
+# Ranking Saham
+st.header("Top Ranking Saham")
 
 ranking = df.sort_values(
     "Probability",
@@ -24,8 +25,8 @@ st.dataframe(
     use_container_width=True
 )
 
-# Top 20 Chart
-st.subheader("Top AI Probability")
+# Grafik Top 20
+st.header("Top 20 AI Probability")
 
 top20 = ranking.head(20)
 
@@ -42,12 +43,12 @@ st.plotly_chart(
     use_container_width=True
 )
 
-# Filter saham
-st.subheader("Detail Saham")
+# Detail saham
+st.header("Detail Saham")
 
 ticker = st.selectbox(
-    "Pilih Saham",
-    ranking["Ticker"].unique()
+    "Pilih Ticker",
+    ranking["Ticker"]
 )
 
 detail = ranking[
