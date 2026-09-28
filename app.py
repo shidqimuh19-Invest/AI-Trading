@@ -2,127 +2,56 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 
-# ======================
-# CONFIG
-# ======================
-
 st.set_page_config(
-    page_title="LQ45 AI Trading",
+    page_title="LQ45 AI Trading Dashboard",
     layout="wide"
 )
 
-# ======================
-# LOAD DATA
-# ======================
+st.title("📈 LQ45 AI Trading Dashboard")
 
 df = pd.read_excel("AI_Ranking.xlsx")
 
-# ======================
-# SIDEBAR
-# ======================
+# Ranking
+st.subheader("Top Ranking Saham")
 
-menu = st.sidebar.selectbox(
-    "Pilih Menu",
-    [
-        "Market Overview",
-        "AI Ranking",
-        "Analisis Saham",
-        "Portfolio Builder"
-    ]
+ranking = df.sort_values(
+    "Probability",
+    ascending=False
 )
 
-# ======================
-# MENU 1
-# ======================
+st.dataframe(
+    ranking,
+    use_container_width=True
+)
 
-if menu == "Market Overview":
+# Top 20 Chart
+st.subheader("Top AI Probability")
 
-    st.title("📊 Market Overview")
+top20 = ranking.head(20)
 
-    st.write("Ringkasan kondisi market saat ini")
+fig = px.bar(
+    top20,
+    x="Ticker",
+    y="Probability",
+    color="Probability",
+    title="Top 20 Saham Berdasarkan AI Probability"
+)
 
-    jumlah_saham = len(df)
+st.plotly_chart(
+    fig,
+    use_container_width=True
+)
 
-    st.metric(
-        "Jumlah Saham",
-        jumlah_saham
-    )
+# Filter saham
+st.subheader("Detail Saham")
 
-# ======================
-# MENU 2
-# ======================
+ticker = st.selectbox(
+    "Pilih Saham",
+    ranking["Ticker"].unique()
+)
 
-elif menu == "AI Ranking":
+detail = ranking[
+    ranking["Ticker"] == ticker
+]
 
-    st.title("🏆 AI Ranking")
-
-    ranking = df.sort_values(
-        "Probability",
-        ascending=False
-    )
-
-    st.dataframe(
-        ranking,
-        use_container_width=True
-    )
-
-    top20 = ranking.head(20)
-
-    fig = px.bar(
-        top20,
-        x="Ticker",
-        y="Probability",
-        color="Probability"
-    )
-
-    st.plotly_chart(
-        fig,
-        use_container_width=True
-    )
-
-# ======================
-# MENU 3
-# ======================
-
-elif menu == "Analisis Saham":
-
-    st.title("📈 Analisis Saham")
-
-    ticker = st.selectbox(
-        "Pilih Saham",
-        sorted(df["Ticker"].unique())
-    )
-
-    detail = df[
-        df["Ticker"] == ticker
-    ]
-
-    st.dataframe(detail)
-
-# ======================
-# MENU 4
-# ======================
-
-elif menu == "Portfolio Builder":
-
-    st.title("💰 Portfolio Builder")
-
-    modal = st.number_input(
-        "Masukkan Modal",
-        value=100000000
-    )
-
-    st.write(
-        f"Modal Anda : Rp {modal:,.0f}"
-    )
-
-    top5 = df.head(5)
-
-    alokasi = modal / 5
-
-    hasil = pd.DataFrame({
-        "Ticker": top5["Ticker"],
-        "Alokasi": alokasi
-    })
-
-    st.dataframe(hasil)
+st.dataframe(detail)
