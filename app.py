@@ -383,7 +383,113 @@ if menu == "Market Overview":
     # -----------------------------------------------------
     # G. INTERPRETASI
     # -----------------------------------------------------
+    # =====================================================
+    # 10 SAHAM DENGAN PROBABILITY TERENDAH
+    # =====================================================
 
+    st.divider()
+
+    st.subheader("10 Probability Terendah")
+
+    st.write(
+        "Tabel ini membantu melihat saham yang dinilai "
+        "paling lemah oleh model AI."
+    )
+
+    bottom10 = (
+        df.sort_values(
+            by="Probability",
+            ascending=True
+        )
+        .head(10)
+        .copy()
+    )
+
+    bottom10["Probability (%)"] = (
+        bottom10["Probability"] * 100
+    ).round(2)
+
+    kolom_bottom = [
+        "Ticker",
+        "Close",
+        "Probability (%)",
+        "Recommendation"
+    ]
+
+    for kolom in [
+        "RSI14",
+        "Momentum20",
+        "MACD"
+    ]:
+        if kolom in bottom10.columns:
+            kolom_bottom.append(kolom)
+
+    st.dataframe(
+        bottom10[kolom_bottom],
+        use_container_width=True,
+        hide_index=True
+    )
+
+    grafik_bottom10 = px.bar(
+        bottom10,
+        x="Ticker",
+        y="Probability (%)",
+        color="Recommendation",
+        color_discrete_map=warna_sinyal,
+        text="Probability (%)",
+        title="10 Saham dengan Probability Terendah"
+    )
+
+    grafik_bottom10.update_layout(
+        xaxis_title="Ticker",
+        yaxis_title="Probability (%)"
+    )
+
+    st.plotly_chart(
+        grafik_bottom10,
+        use_container_width=True
+    )
+        # =====================================================
+    # SELURUH HASIL AI
+    # =====================================================
+
+    st.divider()
+
+    st.subheader("Seluruh Hasil AI")
+
+    semua_hasil = (
+        df.sort_values(
+            by="Probability",
+            ascending=False
+        )
+        .copy()
+    )
+
+    semua_hasil["Probability (%)"] = (
+        semua_hasil["Probability"] * 100
+    ).round(2)
+
+    kolom_semua = [
+        "Ticker",
+        "Close",
+        "Probability (%)",
+        "Recommendation"
+    ]
+
+    for kolom in [
+        "RSI14",
+        "Momentum20",
+        "Momentum60",
+        "MACD"
+    ]:
+        if kolom in semua_hasil.columns:
+            kolom_semua.append(kolom)
+
+    st.dataframe(
+        semua_hasil[kolom_semua],
+        use_container_width=True,
+        hide_index=True
+    )
     st.subheader("Panduan Interpretasi")
 
     st.write(
@@ -564,3 +670,65 @@ elif menu == "Portfolio Builder":
             "Perhitungan menggunakan 1 lot = 100 saham dan "
             "belum memperhitungkan biaya broker."
         )
+    # =====================================================
+    # KESIMPULAN OTOMATIS
+    # =====================================================
+
+    st.subheader("Kesimpulan Sinyal Hari Ini")
+
+    saham_buy = df[
+        df["Recommendation"] == "BUY"
+    ].copy()
+
+    saham_hold = df[
+        df["Recommendation"] == "HOLD"
+    ].copy()
+
+    saham_sell = df[
+        df["Recommendation"] == "SELL"
+    ].copy()
+
+    if not saham_buy.empty:
+
+        daftar_buy = ", ".join(
+            saham_buy["Ticker"].astype(str).tolist()
+        )
+
+        st.success(
+            "Terdapat "
+            + str(len(saham_buy))
+            + " saham dengan sinyal BUY: "
+            + daftar_buy
+        )
+
+    else:
+
+        st.warning(
+            "Belum terdapat saham yang mencapai batas BUY "
+            "sebesar 70%."
+        )
+
+    if not saham_sell.empty:
+
+        daftar_sell = ", ".join(
+            saham_sell["Ticker"].astype(str).tolist()
+        )
+
+        st.error(
+            "Terdapat "
+            + str(len(saham_sell))
+            + " saham dengan sinyal SELL: "
+            + daftar_sell
+        )
+
+    else:
+
+        st.info(
+            "Belum terdapat saham yang mencapai batas SELL "
+            "sebesar 40% atau lebih rendah."
+        )
+
+    st.write(
+        "Jumlah saham HOLD:",
+        len(saham_hold)
+    )
